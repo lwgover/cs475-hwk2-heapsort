@@ -29,26 +29,33 @@ int right(int i){
 }
 
 /**
+ * reverses the order of an employee array
+ * 
+ * @param *A Pointer to the list of employees
+ * @param start the index to start at
+ * @param end the index to end at 
+*/
+void reverse(struct Employee *A, int start, int end){
+	for(int i = 0; i < (end+1)/2; i++){
+		swap(&A[i],&A[end-i]);
+	}
+
+}
+
+/**
  * Sorts a list of n employees in descending order
  *
  * @param	*A	Pointer to the list of employees
  * @param	n	Size of the heap
  */
-void heapSort(Employee *A, int n)
+void heapSort(struct Employee *A, int n)
 {
-	// BuildHeap on the heap
-	printf("hi");
-	buildHeap(&A[0],n);
-
-	int m = n;
-	while (m > 0){
-		//swap A[n-1] with A[0], since A[0] is the smallest number.
-		swap(&A[n-1],&A[0]);
-		m--;
-		heapify(&A[0],0,m);
-	// TODO - A[n-1] now sorted in place, so decrement n
-	// TODO - Heapify the elements from A[0] up to A[n-1] (which leaves the newly sorted element alone)
+	buildHeap(A, n); // build the heap
+	for(int i = n-1; i >=0; i--){ // from n-1 to 0
+		swap(&A[0],&A[i]); // put the smallest at the end, protected
+		buildHeap(&A[0],i); // build heap with smallest protected
 	}
+	reverse(&A[0],0,n-1); // reverse the list
 }
 
 /**
@@ -59,14 +66,14 @@ void heapSort(Employee *A, int n)
  * @param	*A	Pointer to the list of employees
  * @param	n	Size of the heap
  */
-void buildHeap(Employee *A, int n)
+void buildHeap(struct Employee *A, int n)
 {
-	// heapify() every element from A[n/2] down-to A[0]
-	for(int i = n/2; i >= 0; i--){
-		heapify(&A[0],i,n);
+	for(int i = n / 2; i >= 0; i--){  
+		heapify(A,i,n); // heapify A[i]
 	}
 }
 
+
 /**
  * We want to start with A[i] and percolate it downward
  * if it is greater than either left or right child.
@@ -75,32 +82,26 @@ void buildHeap(Employee *A, int n)
  * @param	i	Index of current element to heapify
  * @param	n	Size of the heap
  */
-/**
- * We want to start with A[i] and percolate it downward
- * if it is greater than either left or right child.
- *
- * @param	*A	Pointer to the list of employees
- * @param	i	Index of current element to heapify
- * @param	n	Size of the heap
- */
-void heapify(Employee *A, int i, int n)
+void heapify(struct Employee *A, int i, int n)
 {
-	// Determine which child has a smaller salary. We'll call the index of this
-	// element: "smaller"
-	int smaller;
-	if (right(i) < n && A[right(i)].salary < A[left(i)].salary){
-		smaller = right(i);
-	}else{
-		smaller = left(i);
+	if (i >= n || left(i) >= n){ // stop recursion when i or children get out of bounds. Fixes segmentation fault issue I think
+		return;
 	}
 
-	// Recursively check if the salary at A[i] > the salary at A[smaller]. If it is, swap the two.
-	// Then recursively heapify A[smaller].
-	if (i < n && A[i].salary > A[smaller].salary) {
-		Employee temp = A[i];
-		A[i] = A[smaller];
-		A[smaller] = temp;
-		heapify(A, smaller, n);
+	int smaller; // index of child with smaller salary
+	if (left(i) < n && right(i) == n){ // when there's no right child
+		smaller = left(i);
+	}
+	else if (A[left(i)].salary < A[right(i)].salary){ // determine which child is smaller
+		smaller = left(i); 
+	}
+	else{
+		smaller = right(i);
+	}
+
+	if (A[i].salary > A[smaller].salary){ // do i and smaller violate min heap property?
+		swap(&A[i], &A[smaller]); // if so, swap the two
+		heapify(A, smaller, n); // recursively push down A[smaller]
 	}
 }
 
