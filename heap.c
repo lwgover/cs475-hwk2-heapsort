@@ -53,7 +53,7 @@ void heapSort(struct Employee *A, int n)
 	buildHeap(A, n); // build the heap
 	for(int i = n-1; i >=0; i--){ // from n-1 to 0
 		swap(&A[0],&A[i]); // put the smallest at the end, protected
-		buildHeap(&A[0],i); // build heap with smallest protected
+		heapify(&A[0],i); // build heap with smallest protected
 	}
 	reverse(&A[0],0,n-1); // reverse the list
 }
